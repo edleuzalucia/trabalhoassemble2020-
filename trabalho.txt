@@ -1,0 +1,63 @@
+			.data               # indica para o montador a area de dado 
+Vet:		.word 10	    # reserva espaco de 10 bytes    
+			.text               # indica inicio do codigo
+main:		subi $sp,$sp,20		#empilhar registradores
+			sw $s0,0($sp)		# empilhar registradores
+			sw $s1,4($sp)		# empilhar registradores
+			sw $s2,8($sp)		# empilhar registradores
+			sw $s3,12($sp)		# empilhar registradores
+			sw $s4,16($sp)		# empilhar registradores
+			addi $s1,$zero,10   #   faz  RN=10
+			addi $s0,$zero,0    # faz I=0
+for: 		slt $t0,$s0,$s1     #compara se I<RN
+			beq $t0,$zero,finalfor #compara se o valor de $t0 é se for pula para final do for
+			muli $t0,$s0,4	    #multiplica o I*4 
+			sw $s0,Vet($t0)	    #salva Vet[i]=i
+			addi $s0,$s0,1	    #faz i++
+			j for				#salto no for
+finalfor:  	add $a0,$s1,$zero   #passa O argumento $a0=$s1
+			jal calcmedia		#chamada da funcao que calcula media
+			add $s2,$v0,$zero   #adiciona o valor da media em $vo
+			lw $ra,16($sp)		#leitura dos registradores
+			lw $ra,12($sp)		#leitura dos registradores
+			lw $ra,8($sp)		#leitura dos registradores
+			lw $ra,4($sp)		#leitura dos registradores
+			lw $ra,0($sp)		#leitura dos registradores
+			jr $ra				#salto fim
+calcmedia:	subi $sp,$sp,12		#diminuindo na posicao 12
+			sw $s0,0($sp)		#salva valor no registrador
+			sw $s1,4($sp)		#salva valor no registrador
+			sw $a0,8($sp)		#salva valor no registrador
+			addi $s0,$zero,0	#assumi o valor 0 no $s0
+			addi $s1,$zero,0	#assumi o valor 0 no $41
+for1:		slt $t0,$s0,$a0		#compara se $s0<$a0 e salva em regist temporario
+			beq $t0,$zero,finalfor# se o registrador temporario for menor ele salta finalfor
+			muli $t0,$s0,4		#multiplicao vet[i]
+			lw $t1,vet($t0)		#leitura registrador temporario $t0 que esta no vetor para $t1
+			add $s1,$s1,$t1		#soma=soma
+			addi $s0,$s0,1		#i++
+			j for1				#salta do for1
+finalfor:   div $v0,$s1,$va 	# div soma/n
+			lw $a0,8($sp)		#leitura de argumento na posicao 8
+			lw $s1,9($sp)		#leitura de argumento na posicao 8
+			lw $s0,0($sp)		#leitura de argumento na posicao 8
+			addi $sp,$sp,12		#soma $sp+12
+			jr    $ra	    # retorna da funcao
+
+#static void Main(string[] args)         
+#main () {   $s1=RN, $s0=i          
+#
+#   int n,i = 10;
+#   int Vet[n]
+#   for(i=0;i<n,i++); 
+#{
+#   Vet[i] = i; 
+#media =calcmedia(vet.n)
+#}
+# int calcmedia(int vet[], int n){
+#int i, soma=0;
+#for(i=0,i<n,i++
+#soma=soma+vet[i];
+#return(soma/n);
+#
+#}
